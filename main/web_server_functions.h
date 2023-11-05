@@ -10,5 +10,9 @@ void handleRoot();
 void handleAddWifi();
 void handleSkipWifi();
 void handleController();
+void handleSetColor();
+void handleSetEffect();
+void handelLedTurnOnOff();
+void handelSetBrightness();
 
 #endif // WEB_SERVER_FUNCTIONS_H

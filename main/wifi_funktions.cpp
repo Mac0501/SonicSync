@@ -5,6 +5,7 @@
 
 String newHostname = "SonicSync";
 
+
 void setupAccessPoint() {
     String ssid, password;
 
@@ -16,7 +17,7 @@ void setupAccessPoint() {
             Serial.println("Setting up Access Point...");
             closeAccessPoint(); // Close any existing Access Point
             WiFi.mode(WIFI_AP);
-            WiFi.softAP("MyESP8266AP", "password123");
+            WiFi.softAP("SonicSync AP", "password123");
             Serial.println("Access Point set up");
         }
     } else {
@@ -24,7 +25,7 @@ void setupAccessPoint() {
         Serial.println("No credentials found. Setting up Access Point...");
         closeAccessPoint(); // Close any existing Access Point
         WiFi.mode(WIFI_AP);
-        WiFi.softAP("MyESP8266AP", "password123");
+        WiFi.softAP("SonicSync AP", "password123");
         Serial.println("Access Point set up");
     }
 }
