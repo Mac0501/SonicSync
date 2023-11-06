@@ -4,96 +4,236 @@
 const char* rootPage = R"HTML(
 <!DOCTYPE html>
 <html>
-<head>
-    <style>
-        body {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-        }
-        .container {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        input[type='text'], input[type='password'] {
-            width: 200px;
-            padding: 10px;
-            margin-bottom: 10px;
-            font-size: 16px;
-        }
-        input[type='submit'], input[type='button'] {
-            background-color: #4CAF50;
-            color: white;
-            padding: 14px 20px;
-            margin: 8px 0;
-            border: none;
-            cursor: pointer;
-            font-size: 16px;
-            border-radius: 12px; /* Rounded corners */
-        }
-        input[type='submit']:hover, input[type='button']:hover {
-            background-color: #45a049;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Enter Wi-Fi Credentials</h1>
-        <form method='post' action='/add-wifi' id='wifiForm'>
-            SSID: <input type='text' name='ssid'><br>
-            Password: <input type='password' name='password'><br>
-            <input type='submit' value='Connect to Wifi'>
-        </form>
-    </div>
-    <div class="container">
-        <input type='button' value='Continue without Wifi' onclick='skipWifi()'>
-    </div>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style>
+            body {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                height: 100vh;
+                margin: 0;
+                background-color: #212121;
+            }
+            #form {
+                display: grid;
+                place-items: center;
+                width: 300px;
+                height: 472px;
+                padding: 25px;
+                background-color: #161616;
+                box-shadow: 0 15px 60px #FF69B4;
+                outline: 1px solid #ff0396;
+                border-radius: 10px;
+            }
 
-    <script>
-        document.getElementById('wifiForm').onsubmit = function(event) {
-            event.preventDefault();
-            var formData = new FormData(this);
-            
-            fetch('/add-wifi', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => {
-                if (response.ok) {
-                    return response.text();
-                }
-                throw new Error('Network response was not ok.');
-            })
-            .then(data => {
-                alert(data);
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-        };
+            #form-body {
+                position: absolute;
+                top: 50%;
+                right: 25px;
+                left: 25px;
+                width: 230px;
+                margin: -156px auto 0;
+            }
 
-        function skipWifi() {
-            fetch('/skip-wifi', {
-                method: 'POST'
-            })
-            .then(response => {
-                if (response.ok) {
-                    return response.text();
-                }
-                throw new Error('Network response was not ok.');
-            })
-            .then(data => {
-                alert(data);
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-        }
-    </script>
-</body>
+            #welcome-lines {
+                text-align: center;
+                line-height: 1;
+            }
+
+            #welcome-line-1 {
+                color: #FF69B4;
+                font-weight: 600;
+                font-size: 40px;
+            }
+
+            #welcome-line-2 {
+                color: #ffffff;
+                font-size: 18px;
+                margin-top: 17px;
+            }
+
+            #input-area {
+                margin-top: 10px;
+            }
+
+            .form-inp {
+                padding: 11px 25px;
+                background: transparent;
+                border: 1px solid #e3e3e3;
+                line-height: 1;
+                border-radius: 8px;
+            }
+
+            .form-inp:focus {
+                border: 1px solid #FF69B4;
+            }
+
+            .form-inp:first-child {
+                margin-bottom: 15px;
+            }
+
+            .form-inp input {
+                width: 100%;
+                background: none;
+                font-size: 13.4px;
+                color: #FF69B4;
+                border: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            .form-inp input:focus {
+                outline: none;
+            }
+
+            #submit-button-cvr {
+                margin-top: 20px;
+            }
+
+            #submit-button {
+                display: block;
+                width: 100%;
+                color: #FF69B4;
+                background-color: transparent;
+                font-weight: 600;
+                font-size: 14px;
+                margin: 0;
+                padding: 14px 13px 12px;
+                border: 0;
+                outline: 1px solid #FF69B4;
+                border-radius: 8px;
+                line-height: 1;
+                cursor: pointer;
+                transition: all ease-in-out 0.3s;
+            }
+
+            #submit-button:hover {
+                transition: all ease-in-out 0.3s;
+                background-color: #FF69B4;
+                color: #161616;
+                cursor: pointer;
+            }
+
+            #forgot-pass {
+                text-align: center;
+                margin-top: 10px;
+            }
+
+            #forgot-pass a {
+                color: #868686;
+                font-size: 12px;
+                text-decoration: none;
+            }
+
+            #bar {
+                position: absolute;
+                left: 50%;
+                bottom: -50px;
+                width: 28px;
+                height: 8px;
+                margin-left: -33px;
+                background-color: #FF69B4;
+                border-radius: 10px;
+            }
+
+            #bar:after,
+            #bar:before {
+                content: "";
+                position: absolute;
+                width: 8px;
+                height: 8px;
+                background-color: #ececec;
+                border-radius: 50%;
+            }
+
+            #bar:before {
+                right: -20px;
+            }
+
+            #bar:after {
+                right: -38px;
+            }
+
+            .warning-message {
+                display: block;
+                color: #161616;
+                margin-top: 40px;
+                font-size: 12px;
+            }
+
+            .show-warning {
+                color: red;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="form-ui">
+            <form method='post' action='/add-wifi' id='form'>
+                <div id="form-body">
+                    <div id="welcome-lines">
+                        <div id="welcome-line-1">SonicSync</div>
+                        <div id="welcome-line-2">The Future of light effects</div>
+                    </div>
+                    <div class="warning-message" id="warningMessage">Incorrect Wlan SSID or Password.</div>
+                    <div id="input-area">
+                        <div class="form-inp">
+                            <input required="" placeholder="Wlan SSID" type="text" name='ssid'>
+                        </div>
+                        <div class="form-inp">
+                            <input required="" placeholder="Wlan Password" type="password" name='password'>
+                        </div>
+                    </div>
+                    <div id="submit-button-cvr">
+                        <button id="submit-button" type="submit">Connect to Wlan</button>
+                    </div>
+                    <div id="forgot-pass">
+                        <a onclick='skipWifi()' style="cursor: pointer;">Continue without Wlan</a>
+                    </div>
+                    <div id="bar"></div>
+                </div>
+            </form>
+        </div>
+
+        <script>
+            document.getElementById('form').onsubmit = async function (event) {
+              event.preventDefault();
+              var formData = new FormData(this);
+
+              try {
+                  var response = await fetch('/add-wifi', {
+                      method: 'POST',
+                      body: formData,
+                  });
+
+                  if (response.ok) {
+                      alert("You can now connect to SonicSync over your network.");
+                  } else {
+                      var warningMessage = document.getElementById('warningMessage');
+                      warningMessage.classList.add('show-warning');
+                  }
+              } catch (error) {
+                  console.error('Error:', error);
+              }
+          };
+
+            function skipWifi() {
+                fetch('/skip-wifi', {method: 'POST'})
+                    .then(response => {
+                        if (response.ok) {
+                            // Redirect to the /controller page
+                            window.location.href = '/controller';
+                        } else {
+                            throw new Error('Network response was not ok.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            }
+        </script>
+    </body>
 </html>
 )HTML";
 
