@@ -5,7 +5,9 @@ const char* rootPage = R"HTML(
 <!DOCTYPE html>
 <html>
     <head>
+        <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>SonicSync</title>
         <style>
             body {
                 display: flex;
@@ -84,6 +86,26 @@ const char* rootPage = R"HTML(
                 margin: 0;
             }
 
+            #loader {
+                border: 2px solid rgba(255, 255, 255, 0.3);
+                border-radius: 50%;
+                border-top: 2px solid #FF69B4;
+                width: 15px;
+                height: 15px;
+                animation: spin 2s linear infinite;
+                display: inline-block;
+                margin-right: 10px;
+            }
+
+            @keyframes spin {
+                0% {
+                    transform: rotate(0deg);
+                }
+                100% {
+                    transform: rotate(360deg);
+                }
+            }
+
             .form-inp input:focus {
                 outline: none;
             }
@@ -93,8 +115,14 @@ const char* rootPage = R"HTML(
             }
 
             #submit-button {
-                display: block;
+                display: flex;
+                /* Use flexbox to align items horizontally */
+                align-items: center;
+                /* Center items vertically within the button */
+                justify-content: center;
+                /* Center items horizontally within the button */
                 width: 100%;
+                height: 40px;
                 color: #FF69B4;
                 background-color: transparent;
                 font-weight: 600;
@@ -131,29 +159,15 @@ const char* rootPage = R"HTML(
                 position: absolute;
                 left: 50%;
                 bottom: -50px;
-                width: 28px;
+                transform: translateX(-50%);
+                align-items: center;
+                justify-content: center;
+                display: flex;
+                width: 40px;
                 height: 8px;
-                margin-left: -33px;
+                margin-left: 0;
                 background-color: #FF69B4;
                 border-radius: 10px;
-            }
-
-            #bar:after,
-            #bar:before {
-                content: "";
-                position: absolute;
-                width: 8px;
-                height: 8px;
-                background-color: #ececec;
-                border-radius: 50%;
-            }
-
-            #bar:before {
-                right: -20px;
-            }
-
-            #bar:after {
-                right: -38px;
             }
 
             .warning-message {
@@ -165,6 +179,21 @@ const char* rootPage = R"HTML(
 
             .show-warning {
                 color: red;
+            }
+            #submit-button.loading:hover {
+                background-color: transparent;
+                color: #FF69B4;
+                cursor: default;
+            }
+            #confirmation-message {
+                color: #ffffff;
+                font-size: 15px;
+            }
+            #timer {
+                margin-top: 5px;
+                margin-bottom: 5px;
+                font-size: 30px;
+                text-align: center;
             }
         </style>
     </head>
@@ -197,26 +226,85 @@ const char* rootPage = R"HTML(
         </div>
 
         <script>
-            document.getElementById('form').onsubmit = async function (event) {
-              event.preventDefault();
-              var formData = new FormData(this);
+            document
+                .getElementById('form')
+                .onsubmit = function (event) {
+                    event.preventDefault();
+                    var formData = new FormData(this);
+                    var submitButton = document.getElementById('submit-button');
+                    var originalButtonContent = submitButton.innerHTML;
 
-              try {
-                  var response = await fetch('/add-wifi', {
-                      method: 'POST',
-                      body: formData,
-                  });
+                    submitButton
+                        .classList
+                        .add('loading');
 
-                  if (response.ok) {
-                      alert("You can now connect to SonicSync over your network.");
-                  } else {
-                      var warningMessage = document.getElementById('warningMessage');
-                      warningMessage.classList.add('show-warning');
-                  }
-              } catch (error) {
-                  console.error('Error:', error);
-              }
-          };
+                    // Change button content to the loading SVG and text
+                    submitButton.innerHTML = `
+                        <div id="loader" class="loader"></div>
+                        Connecting...
+                    `;
+                    fetch('/add-wifi', {
+                        method: 'POST',
+                        body: formData
+                    })
+                        .then(response => {
+                            console.log('Response Status:', response.status);
+                            console.log('Response Status:', response.content);
+                            return response.text();
+                        })
+                        .then(data => {
+                            console.log('Response Content:', data.content);
+                            if (response.ok) {
+                                var confirmationMessage = document.getElementById('form-ui')
+                                confirmationMessage.innerHTML = `
+                                <div id="form">
+                                    <div id="form-body">
+                                        <div id="welcome-lines">
+                                            <div id="welcome-line-1">SonicSync</div>
+                                            <div id="welcome-line-2">The Future of light effects</div>
+                                        </div>
+                                        <div id="input-area" style="margin-top: 70px;">
+                                            <div id="confirmation-message">
+                                                <div>SonicSync is now connected to your network.</div>
+                                                <div>You will be redirected in:</div>
+                                                <div id="timer">10</div>
+                                                <div>Or you can connect now to SonicSync over "${response.content}" in your network.</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                `;
+
+                                // Implement redirection timer
+                                var timerElement = document.getElementById('timer');
+                                var count = 10;
+                                var timer = setInterval(function () {
+                                    count--;
+                                    timerElement.textContent = count;
+                                    if (count <= 0) {
+                                        clearInterval(timer);
+                                        // Redirect to the specified URL
+                                        window.location.href = response.content;
+                                    }
+                                }, 1000);
+                            } else {
+                                var warningMessage = document.getElementById('warningMessage');
+                                warningMessage
+                                    .classList
+                                    .add('show-warning');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                        })
+                        . finally(() => {
+                            submitButton
+                                .classList
+                                .remove('loading');
+                            // Restore the original button content after fetch completes
+                            submitButton.innerHTML = originalButtonContent;
+                        });
+                };
 
             function skipWifi() {
                 fetch('/skip-wifi', {method: 'POST'})

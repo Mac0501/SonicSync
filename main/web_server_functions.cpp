@@ -52,13 +52,15 @@ void handleAddWifi() {
     String password = server.arg("password");
 
     // Wait for connection
-    bool success = connectToWiFi(ssid.c_str(), password.c_str());
+    IPAddress deviceIP;
+    bool success = connectToWiFi(ssid.c_str(), password.c_str(), 10, &deviceIP);
+    Serial.println(deviceIP);
 
     String response;
     if (success) {
         saveCredentials(ssid, password);
         saveFlag(true);
-        response = "Okay, Connected to Wi-Fi: " + ssid;
+        response = "http://" + deviceIP.toString();
         server.send(200, "text/plain", response);
         delay(2000);
         closeAccessPoint();

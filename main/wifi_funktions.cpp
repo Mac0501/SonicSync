@@ -36,7 +36,7 @@ void closeAccessPoint() {
     Serial.println("Closed Access Point");
 }
 
-bool connectToWiFi(const char* ssid, const char* password, int tries) {
+bool connectToWiFi(const char* ssid, const char* password, int tries, IPAddress* ipAddress) {
     int attempt = 0;
     // Connect to Wi-Fi network
     WiFi.hostname(newHostname.c_str());
@@ -51,6 +51,9 @@ bool connectToWiFi(const char* ssid, const char* password, int tries) {
 
     if (WiFi.status() == WL_CONNECTED) {
         Serial.println("Connected to WiFi");
+        if (ipAddress != nullptr) {
+            *ipAddress = WiFi.localIP(); // Store the IP address in the provided pointer variable
+        }
         return true;
     } else {
         Serial.println("Failed to connect to WiFi");
