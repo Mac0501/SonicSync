@@ -3,7 +3,12 @@
 
 #include <Adafruit_NeoPixel.h>
 
+#ifdef ESP8266
 #define PIN D4
+#elif ESP32
+#define PIN 15
+#endif
+
 #define NUM_LEDS 120
 
 enum LedEffect {
@@ -11,8 +16,7 @@ enum LedEffect {
     RUNNING_LIGHTS,
     THEATER_CHASE,
     AUDIO_EFFECT,
-    // Add more effects here if needed
-    NO_EFFECT // Special value for no effect
+    NO_EFFECT
 };
 
 extern Adafruit_NeoPixel strip;
@@ -27,9 +31,8 @@ void setColor(uint32_t color);
 void rainbowCycle(uint8_t wait);
 void runningLights(uint32_t color, uint8_t wait);
 void theaterChase(uint32_t color, uint8_t wait);
-void ausioEffect(uint32_t color, uint8_t density);
+void audioEffect(uint32_t color, uint8_t density);
 uint32_t Wheel(byte WheelPos);
 void handelLedEffects();
-// Declare other LED control functions here
 
-#endif /* LED_FUNCTIONS_H */
+#endif

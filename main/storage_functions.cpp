@@ -3,23 +3,34 @@
 #include <SPI.h>
 
 bool InitializeFileSystem() {
-  SPI.begin();
   bool initok = false;
-  initok = SPIFFS.begin();
-  
-  if (!initok) { // Format SPIFS, if not formatted. - Try 1
-    Serial.println("SPIFFS Dateisystem formatiert.");
-    SPIFFS.format();
-    initok = SPIFFS.begin();
-  }
 
-  if (!initok) { // Format SPIFS. - Try 2
-    SPIFFS.format();
+  #ifdef ESP8266
+    SPI.begin();
     initok = SPIFFS.begin();
-  }
+    
+    if (!initok) {
+      Serial.println("SPIFFS Dateisystem formatiert.");
+      SPIFFS.format();
+      initok = SPIFFS.begin();
+    }
+
+    if (!initok) {
+      SPIFFS.format();
+      initok = SPIFFS.begin();
+    }
+  #endif
+
+  #ifdef ESP32
+    if (SPIFFS.begin(true)) {
+      Serial.println("SPIFFS Dateisystem formatiert.");
+    }
+
+    initok = SPIFFS.begin();
+  #endif
 
   if (initok) {
-    Serial.println("SPIFFS ist  OK");
+    Serial.println("SPIFFS ist OK");
   } else {
     Serial.println("SPIFFS ist nicht OK");
   }
@@ -69,4 +80,22 @@ bool readFlag() {
     String flagString = file.readStringUntil('\n');
     file.close();
     return flagString.toInt() != 0;
+}
+
+void deleteFiles() {
+  // Delete credentials file
+  if (SPIFFS.exists("/credentials.txt")) {
+    SPIFFS.remove("/credentials.txt");
+    Serial.println("Deleted credentials.txt");
+  } else {
+    Serial.println("credentials.txt not found");
+  }
+
+  // Delete flag file
+  if (SPIFFS.exists("/flag.txt")) {
+    SPIFFS.remove("/flag.txt");
+    Serial.println("Deleted flag.txt");
+  } else {
+    Serial.println("flag.txt not found");
+  }
 }

@@ -6,7 +6,7 @@ uint32_t globalColor = strip.Color(0, 0, 0);
 
 void initializeLEDs() {
     strip.begin();
-    strip.show(); // Initialize all pixels to 'off'
+    strip.show();
 }
 
 void setLedEffect(LedEffect effect) {
@@ -28,12 +28,10 @@ void turn_led_on_off() {
 }
 
 void setBrightness(uint8_t brightness) {
-  // Ensure brightness is within the valid range (0 to 255)
   brightness = constrain(brightness, 0, 255);
   
-  // Set the brightness (lumens) of the LED strip
   strip.setBrightness(brightness);
-  strip.show(); // Refresh the LED strip to apply the brightness changes
+  strip.show();
 }
 
 void setColor(uint32_t color) {
@@ -48,8 +46,8 @@ void setColor(uint32_t color) {
 }
 
 void rainbowCycle(uint8_t wait) {
-    static uint16_t j = 0; // Static variable to maintain state between function calls
-    static uint32_t lastMillis = 0; // Variable to store the last millis value
+    static uint16_t j = 0;
+    static uint32_t lastMillis = 0;
     
     if (millis() - lastMillis >= wait) {
         for (uint16_t i = 0; i < strip.numPixels(); i++) {
@@ -58,26 +56,23 @@ void rainbowCycle(uint8_t wait) {
         strip.show();
         j++;
         if (j >= 256 * 5) {
-            j = 0; // Reset the rainbow cycle counter
+            j = 0;
         }
-        lastMillis = millis(); // Update the lastMillis value
+        lastMillis = millis();
     }
 }
 
 void runningLights(uint32_t color, uint8_t wait) {
     static int startIndex = 0;
-    static int endIndex = 4;  // Change this value to the number of LEDs in the string
+    static int endIndex = 4;
     static uint32_t lastMillis = 0;
 
     if (millis() - lastMillis >= wait) {
-        // Turn off the LED at the old startIndex
         strip.setPixelColor(startIndex, 0);
 
-        // Move the startIndex and endIndex positions
         startIndex = (startIndex + 1) % strip.numPixels();
         endIndex = (endIndex + 1) % strip.numPixels();
 
-        // Turn on the LEDs from startIndex to endIndex with the specified color
         for (int i = startIndex; i != endIndex; i = (i + 1) % strip.numPixels()) {
             strip.setPixelColor(i, color);
         }
@@ -133,19 +128,18 @@ void handelLedEffects() {
 
     switch (currentLedEffect) {
         case RAINBOW_CYCLE:
-            rainbowCycle(20); // You can adjust the wait time (in milliseconds) as needed
+            rainbowCycle(20);
             break;
         case RUNNING_LIGHTS:
-            runningLights(globalColor, 50); // Color wipe with red color and 50ms delay
+            runningLights(globalColor, 50);
             break;
         case THEATER_CHASE:
-            theaterChase(globalColor, 100); // Theater chase with blue color and 100ms delay
+            theaterChase(globalColor, 100);
             break;
         case AUDIO_EFFECT:
-            audioEffect(globalColor, 10); // AUDIO_EFFECT effect with yellow color and 10% density
+            audioEffect(globalColor, 10);
             break;
         default:
-            // No effect or unknown effect, do nothing
             break;
     }
 }

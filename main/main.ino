@@ -4,7 +4,6 @@
 #include "storage_functions.h"
 
 void setup() {
-    // Initialize serial communication for debugging
     Serial.begin(9500);
     delay(2000);
     Serial.flush();
@@ -12,19 +11,17 @@ void setup() {
 
     InitializeFileSystem();
 
-    // Set up ESP8266 as an Access Point and start the web server
-    setupAccessPoint();
+    setupWifi();
     setupWebServer();
 
-    // Initialize LED strip and set initial configurations
     initializeLEDs();
     Serial.println("Setup finished");
 }
 
 void loop() {
-    // Handle web server requests
     server.handleClient();
 
-    // Run led effects
     handelLedEffects();
+
+    delay(1);
 }
