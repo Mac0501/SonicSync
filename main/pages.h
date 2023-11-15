@@ -244,12 +244,7 @@ const char* rootPage = R"HTML(
                         body: formData
                     })
                         .then(response => {
-                            console.log('Response Status:', response.status);
-                            console.log('Response Status:', response.content);
-                            return response.text();
-                        })
-                        .then(data => {
-                            console.log('Response Content:', data.content);
+                            console.log('Response Content:', response.content);
                             if (response.ok) {
                                 var confirmationMessage = document.getElementById('form-ui')
                                 confirmationMessage.innerHTML = `
@@ -264,7 +259,7 @@ const char* rootPage = R"HTML(
                                                 <div>SonicSync is now connected to your network.</div>
                                                 <div>You will be redirected in:</div>
                                                 <div id="timer">10</div>
-                                                <div>Or you can connect now to SonicSync over "${response.content}" in your network.</div>
+                                                <div>Or you can connect now to SonicSync over "${response.content || 'http://sonicsync'}" in your network.</div>
                                             </div>
                                         </div>
                                     </div>
@@ -278,7 +273,7 @@ const char* rootPage = R"HTML(
                                     timerElement.textContent = count;
                                     if (count <= 0) {
                                         clearInterval(timer);
-                                        window.location.href = response.content;
+                                        window.location.href = response.content || 'http://sonicsync';
                                     }
                                 }, 1000);
                             } else {

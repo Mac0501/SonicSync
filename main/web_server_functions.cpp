@@ -47,6 +47,9 @@ void handleAddWifi() {
     String ssid = server.arg("ssid");
     String password = server.arg("password");
 
+    ssid.trim();
+    password.trim();
+
     IPAddress deviceIP;
     bool success = connectToWiFi(ssid.c_str(), password.c_str(), 10, &deviceIP);
     Serial.println(deviceIP);
