@@ -2,26 +2,28 @@
 #include "wifi_funktions.h"
 #include "web_server_functions.h"
 #include "storage_functions.h"
+#include <utility>
+#include <Arduino.h>
+using namespace std;
+
+TaskHandle_t Task1;
 
 void setup() {
-    Serial.begin(9500);
-    delay(2000);
-    Serial.flush();
-    Serial.println("Setup starts");
+  Serial.begin(115200);
+  delay(2000);
+  Serial.flush();
+  Serial.println("Setup starts");
 
-    InitializeFileSystem();
+  InitializeFileSystem();
+  setupWifi();
+  setupWebServer();
+  initializeLEDs();
 
-    setupWifi();
-    setupWebServer();
-
-    initializeLEDs();
-    Serial.println("Setup finished");
 }
 
+
+
 void loop() {
-    server.handleClient();
-
+  server.handleClient();
     handelLedEffects();
-
-    delay(1);
 }

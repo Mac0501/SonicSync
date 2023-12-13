@@ -31,7 +31,8 @@ void setColor(uint32_t color);
 void rainbowCycle(uint8_t wait);
 void runningLights(uint32_t color, uint8_t wait);
 void theaterChase(uint32_t color, uint8_t wait);
-void audioEffect(uint32_t color, uint8_t density);
+void audioEffect(uint32_t color);
+void spreadColor();
 uint32_t Wheel(byte WheelPos);
 void handelLedEffects();
 
