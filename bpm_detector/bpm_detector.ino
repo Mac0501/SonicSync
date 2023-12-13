@@ -1,4 +1,4 @@
-// SENDER
+// SENDER ESP
 
 #define TXD_PIN 1  // Define TXD pin
 
